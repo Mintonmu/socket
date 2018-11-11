@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
                 if ((n = Read(sockfd, buf, sizeof(buf))) == 0)
                 { /* 当client关闭链接时,服务器端也关闭对应链接 */
-                    printf("This connet is over\n ");
+                    printf("The user[%d] connet is over\n", i);
                     Close(sockfd);
                     FD_CLR(sockfd, &allset); /* 解除select对此文件描述符的监控 */
                     client[i] = -1;

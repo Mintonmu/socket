@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     printf("------------connect ok----------------\n");
     while (fgets(buf, MAXLINE, stdin) != NULL)
     {
+
         Write(sockfd, buf, strlen(buf));
         n = Read(sockfd, buf, MAXLINE);
         if (n == 0)
@@ -37,7 +38,9 @@ int main(int argc, char *argv[])
             break;
         }
         else
-            Write(STDOUT_FILENO, buf, n);
+        {
+            printf("server receive: %s", buf);
+        }
     }
     Close(sockfd);
 

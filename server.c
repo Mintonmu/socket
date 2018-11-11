@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
                 if (client[i] < 0)
                 {                       /* 找client[]中没有使用的位置 */
                     client[i] = connfd; /* 保存accept返回的文件描述符到client[]里 */
+                    printf("client user[%d] join\n", i);
                     break;
                 }
 
@@ -102,8 +103,9 @@ int main(int argc, char *argv[])
                 {
                     for (j = 0; j < n; j++)
                         buf[j] = toupper(buf[j]);
+                    printf("receive buf from client user[%d] is: %s", i, buf);
                     Write(sockfd, buf, n);
-                    Write(STDOUT_FILENO, buf, n);
+                    //Write(STDOUT_FILENO, buf, n);
                 }
                 if (--nready == 0)
                     break; /* 跳出for, 但还在while中 */

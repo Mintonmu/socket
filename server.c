@@ -103,8 +103,8 @@ int main(int argc, char *argv[])
                 {
                     for (j = 0; j < n; j++)
                         buf[j] = toupper(buf[j]);
-                    printf("receive buf from client user[%d] is: %s", i, buf);
                     Write(sockfd, buf, n);
+                    printf("receive buf from client user[%d] is: %s", i, buf);
                     //Write(STDOUT_FILENO, buf, n);
                 }
                 if (--nready == 0)

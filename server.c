@@ -4,10 +4,27 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <ctype.h>
-
+#include <time.h>
 #include "wrap.h"
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define SERV_PORT 6666
+
+void writefile(int fd, char *str, int i)
+{
+    time_t t1;
+    struct tm *t2;
+    char wtext[BUFSIZ];
+    t1 = time(NULL);
+    t2 = localtime(&t1);
+    sprintf(wtext, "%d-%d-%d:%d:%d:%d", t2->tm_year + 1900, t2->tm_mon + 1, t2->tm_mday, t2->tm_hour, t2->tm_min, t2->tm_sec);
+    sprintf(wtext, "%s               user[%d]                        %s\n", wtext, i, str);
+    write(fd, wtext, strlen(wtext));
+}
 
 int main(int argc, char *argv[])
 {
@@ -45,6 +62,9 @@ int main(int argc, char *argv[])
 
     while (1)
     {
+
+        int filefd = open("log.txt", O_WRONLY | O_CREAT | O_APPEND, 0664);
+
         rset = allset; /* 每次循环时都从新设置select监控信号集 */
         nready = select(maxfd + 1, &rset, NULL, NULL, NULL);
         if (nready < 0)
@@ -64,6 +84,8 @@ int main(int argc, char *argv[])
                 {                       /* 找client[]中没有使用的位置 */
                     client[i] = connfd; /* 保存accept返回的文件描述符到client[]里 */
                     printf("client user[%d] join\n", i);
+                    char *tmp = "connetion   success\n";
+                    write(filefd, tmp, strlen(tmp) + 1);
                     break;
                 }
 
@@ -95,6 +117,9 @@ int main(int argc, char *argv[])
                 if ((n = Read(sockfd, buf, sizeof(buf))) == 0)
                 { /* 当client关闭链接时,服务器端也关闭对应链接 */
                     printf("The user[%d] connet is over\n", i);
+                    char *tmp = "close connection\n";
+                    write(filefd, tmp, strlen(tmp) + 1);
+                    close(filefd);
                     Close(sockfd);
                     FD_CLR(sockfd, &allset); /* 解除select对此文件描述符的监控 */
                     client[i] = -1;
@@ -105,6 +130,8 @@ int main(int argc, char *argv[])
                         buf[j] = toupper(buf[j]);
                     Write(sockfd, buf, n);
                     printf("receive buf from client user[%d] is: %s", i, buf);
+
+                    writefile(filefd, buf, i);
                     //Write(STDOUT_FILENO, buf, n);
                 }
                 if (--nready == 0)

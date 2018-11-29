@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         rset = allset; /* 每次循环时都从新设置select监控信号集 */
         nready = select(maxfd + 1, &rset, NULL, NULL, NULL);
         if (nready < 0)
-            perr_exit("select error");
+            handle_error("select error");
 
         if (FD_ISSET(listenfd, &rset))
         { /* 说明有新的客户端链接请求 */
